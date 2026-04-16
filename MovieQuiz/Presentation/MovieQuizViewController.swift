@@ -2,9 +2,16 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         textLabel.textAlignment = .center
+        imageView.layer.cornerRadius = 20
+        imageView.layer.masksToBounds = true
+        yesButton.layer.cornerRadius = 15
+        yesButton.layer.masksToBounds = true
+        noButton.layer.cornerRadius = 15
+        noButton.layer.masksToBounds = true
     }
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions [currentQuestionIndex]
@@ -28,11 +35,6 @@ final class MovieQuizViewController: UIViewController {
     
     @IBOutlet private var noButton: UIButton!
     
-    struct QuizQuestion {
-        let image: String
-        let text: String
-        let correctAnswer: Bool
-    }
     private let questions: [QuizQuestion] = [
         QuizQuestion (image: "The Godfather", text: "Рейтинг этого фильма больше чем 6?", correctAnswer: true),
         
@@ -56,6 +58,12 @@ final class MovieQuizViewController: UIViewController {
     ]
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
+    
+    struct QuizQuestion {
+        let image: String
+        let text: String
+        let correctAnswer: Bool
+    }
     
     struct QuizStepViewModel {
         let image: UIImage

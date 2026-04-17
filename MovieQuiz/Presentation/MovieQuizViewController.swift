@@ -73,6 +73,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private var alertPresenter = AlertPresenter()
     
+    private var statisticService: StatisticServiceProtocol = StatisticService()
+    
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -118,9 +120,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     private func show(quiz result: QuizResultsViewModel) {
+        statisticService.store(correct: correctAnswers, total: questionsAmount)
+        let text = """
+            Ваш результат: \(correctAnswers)/\(questionsAmount)
+            Количество игр: \(statisticService.gamesCount)
+            Рекорд: \(statisticService.bestGame.correct)/\(statisticService.bestGame.total) (\(statisticService.bestGame.date.dateTimeString))
+            Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
+            """
         let alertModel = AlertModel(
             title: "Этот раунд окончен!",
-            message: result.text,
+            message: text,
             buttonText: result.buttonText,
             completion: { [weak self] in
                 guard let self = self else { return }

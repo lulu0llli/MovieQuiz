@@ -19,12 +19,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             noButton.layer.masksToBounds = true
             
             // Настройка фабрики и делегата
-            let factory = QuestionFactory()
-            factory.delegate = self
-            questionFactory = factory
-            
-            // Первый вопрос
-            questionFactory?.requestNextQuestion()
+            questionFactory = QuestionFactory(
+                moviesLoader: MoviesLoader(),
+                delegate: self
+            )
+
+            statisticService = StatisticService()
+            alertPresenter = AlertPresenter()
+        
+            showLoadingIndicator()
+            questionFactory?.loadData()
         
 
     }
@@ -38,6 +42,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             currentQuestion = question
             let viewModel = convert(model: question)
             show(quiz: viewModel)
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
@@ -95,7 +108,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
         )
